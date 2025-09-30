@@ -207,3 +207,105 @@ def time_series_vis (x, y, label, x_axis_rotation = 70, y_axis_rotation = 0, gri
         ##  '03_05_END.ipynb'
         plt.show()
 
+class LoadCropSimulator:
+  """Load Crop Simulator on your environment without installing with pip install."""
+
+  def __init__(self):
+    """
+      DEFINE COMMANDS (Bash script) and success messages and set timeout.
+    """
+    # Clone git repository:
+    self.cmd_line1 = """git clone https://github.com/marcosoares-92/crop_model_proj_case_soybean_uci crop_model_proj_case_soybean_uci"""
+
+    # Move crop_simulator directory to root (Python workspace):
+    self.cmd_line2 = """mv crop_model_proj_case_soybean_uci/crop_simulator ."""
+    # Move KMeans model to root
+    self.cmd_line3 = """mv crop_model_proj_case_soybean_uci/models_and_encodings/kmeans_model.pkl ."""
+    # Move LSTM model to root
+    self.cmd_line4 = """mv crop_model_proj_case_soybean_uci/models_and_encodings/lstm.keras ."""
+
+
+
+  def set_process (self, cmd_line):
+    """Define a process to run from a command:
+    : param: cmd_line (str): command that is passed to a command line interface.
+      Attention: different parts and flags must be separated by single whitespaces.
+    """
+    from subprocess import Popen, PIPE, TimeoutExpired
+
+    proc = Popen(cmd_line.split(" "), stdout = PIPE, stderr = PIPE)
+    """cmd_line = "git clone https://github.com/marcosoares-92/IndustrialDataScienceWorkflow IndustrialDataScienceWorkflow"
+      will lead to the list ['git', 'clone', 'https://github.com/marcosoares-92/IndustrialDataScienceWorkflow', 'IndustrialDataScienceWorkflow']
+      after splitting the string in whitespaces, what is done by .split(" ") method.
+    """
+    return proc
+  
+
+  def run_process (self, proc, msg = ''):
+    """Run process defined by method set_process.
+      : param: proc: process execution object returned from set_process.
+      : param: msg (str): user-defined confirmation method.
+      : param: timeout (int): number of seconds to wait for a command to run, before considering error.
+    """
+
+    try:
+        output, error = proc.communicate()
+        if len(msg > 0):
+          print (msg)
+    except:
+        # General exception
+        output, error = proc.communicate()
+        
+    return output, error
+
+
+  def clone_repo(self):
+    """Clone GitHub Repository."""
+    
+    # SET PROCESS:
+    self.proc1 = self.set_process (self.cmd_line1)
+    # RUN PROCESS:
+    self.output1, self.error1 = self.run_process(self.proc1)
+
+    return self
+
+  
+  def move_pkg(self):
+    """Move package and models to the working directory, to make it available."""
+    
+    # SET PROCESS:
+    self.proc2 = self.set_process (self.cmd_line2)
+    # RUN PROCESS:
+    self.output2, self.error2 = self.run_process(self.proc2)
+    # SET PROCESS:
+    self.proc3 = self.set_process (self.cmd_line3)
+    # RUN PROCESS:
+    self.output3, self.error3 = self.run_process(self.proc3)
+    # SET PROCESS:
+    self.proc4 = self.set_process (self.cmd_line4)
+    # RUN PROCESS:
+    self.output4, self.error4 = self.run_process(self.proc4)
+
+
+    return self
+  
+
+  def move_pkg_alternative(self):
+    """Alternative using the Bash utils module (shutil)"""
+    # importing shutil module  
+    import shutil
+    
+    # Source path  
+    source = 'crop_model_proj_case_soybean_uci/models_and_encodings'  
+    # Destination path  
+    destination = '.'
+    # Move the content of source to destination  
+    dest = shutil.move(source, destination)
+    
+    return self
+
+def load_simulator ():
+  
+  loader = LoadCropSimulator()
+  loader = loader.clone_repo()
+  loader = loader.move_pkg()

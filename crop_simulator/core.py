@@ -169,7 +169,7 @@ def visualize_yield (export_images = True):
         """
 
       print(msg)
-
+      
       df = table_dict['dataframe_obj_to_be_exported']
       timestamp = df['timestamp']
       usage_kwh = df['usage_kwh']

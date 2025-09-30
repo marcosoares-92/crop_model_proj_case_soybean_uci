@@ -123,7 +123,6 @@ from .core import (
 )
 
 
-
 def start_simulation(PT = True):
   """This function runs the following sequence of command line interface commands, 
     for copying the GitHub repository containing the simulator, models and packages to a local 
