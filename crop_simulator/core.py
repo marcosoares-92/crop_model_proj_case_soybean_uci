@@ -167,10 +167,10 @@ def orchestrate_pipelines():
   try:
         # only works in Jupyter Notebook:
         from IPython.display import display
-        display(sim_df)
+        display(df)
             
   except: # regular mode
-        print(sim_df)
+        print(df)
 
 
 def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG):
