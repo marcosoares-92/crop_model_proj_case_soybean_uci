@@ -1,6 +1,6 @@
 from .create import get_dataset
 from .modelling import prediction_pipeline
-from .idswcopy import export_pd_dataframe_as_excel
+from .idswcopy import time_series_vis, upload_to_or_download_file_from_colab, export_pd_dataframe_as_excel
 from .utils import ControlVars, update_control_vars, retrieve_vars_from_global_context
 
 from datetime import datetime, timedelta
