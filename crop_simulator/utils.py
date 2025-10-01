@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 import tensorflow as tf
+from datetime import datetime, timedelta
 
 
 def create_dataset (start_date, end_date):
@@ -9,7 +10,6 @@ def create_dataset (start_date, end_date):
   start_date (str): start date of the dataset. Format: '2024-02-21'
   end_date (str): end date of the dataset. Format: '2024-02-21'
   """
-  from datetime import datetime, timedelta
   # Convert to datetimes
   start_date = datetime.strptime(start_date, '%Y-%m-%d')
   end_date = datetime.strptime(end_date, '%Y-%m-%d')
