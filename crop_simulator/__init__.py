@@ -139,4 +139,4 @@ def cropsim_start_msg(PT = True):
     print("\n")
     print(start_msg)
 
-cropsim_start_msg(PT = PT)
+cropsim_start_msg(PT = True)
