@@ -3,6 +3,8 @@ import pandas as pd
 import sklearn
 import tensorflow as tf
 
+from .core import ControlVars
+
 
 def create_dataset (start_date, end_date):
   """
@@ -104,7 +106,6 @@ def generate_numeric_column (setpoint, column, total_values):
   values = np.where(mask == 1, setpoint, random_values)
 
   return values
-
 
 def apply_encoding(df):
   """
@@ -310,3 +311,20 @@ def update_df (df, y_pred):
   dataset['GY'] = y
 
   return dataset
+
+def update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path):
+  """Update control variables with user defined inputs.
+  : params start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG: user defined parameters.
+  : params cluster_model_path, lstm_model_path: paths for the model files
+  """
+  ControlVars.start_date = start_date
+  ControlVars.end_date = end_date
+  ControlVars.cultivar = cultivar
+  ControlVars.PH = PH
+  ControlVars.NLP = NLP
+  ControlVars.NGL = NGL
+  ControlVars.NS = NS
+  ControlVars.IFP = IFP
+  ControlVars.MHG = MHG
+  ControlVars.cluster_model_path = cluster_model_path
+  ControlVars.lstm_model_path = lstm_model_path

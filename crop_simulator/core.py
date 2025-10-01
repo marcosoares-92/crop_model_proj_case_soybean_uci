@@ -1,10 +1,9 @@
-from dataclasses import dataclass
-
 from .create import get_dataset
 from .modelling import prediction_pipeline
 from .idswcopy import export_pd_dataframe_as_excel
+from .utils import update_control_vars
 
-
+from dataclasses import dataclass
 
 @dataclass
 class ControlVars:
@@ -12,35 +11,27 @@ class ControlVars:
     language_pt = True # If language_pt = True, responses are shown in Portugues (BR). Otherwise, they are in English
     # default value of start date will be the instant:
     server_start_time = pd.Timestamp(datetime.now())
-
+    simulation_counter = 0 # Count how many simulations were run
+    exported_tables = [] # List of exported tables
 
 def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path):
   """Run all the pipelines to obtain a full simulation.
-  At the end, store in a list of dictionaries in GlobalVars, that will be used for exporting a 
+  At the end, store in a list of dictionaries in ControlVars, that will be used for exporting a 
   consolidated Excel file with all simulations.
   : params start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG: user defined parameters.
   : params cluster_model_path, lstm_model_path: paths for the model files
   """
   df = get_dataset(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG)
   df = prediction_pipeline(df, cluster_model_path, lstm_model_path)
-
-  
-  ControlVars.show_results = False
-  ControlVars.show_plots = False
-  
-  # Get initial dataframe with user defined inputs:
-  sim_df = update_with_inputs(var1, var2, var3, var4, var5, var6, var7, var8)
-  # Run simulation pipeline:
-  sim_df = simulation_pipeline(sim_df, GlobalVars.possible_ranges, GlobalVars.kmeans_model, GlobalVars.encoder_decoder_tf_model)
-  # Update on GlobalVars:
-  GlobalVars.sim_df = sim_df
-
-  # Get the simulation counting:
-  simulation_counter = GlobalVars.simulation_counter
+  # Update on ControlVars:
+  ControlVars.df = df
+  # Update the simulation counting:
+  ControlVars.simulation_counter = ControlVars.simulation_counter + 1
   # Get list exported_tables:
-  exported_tables = GlobalVars.exported_tables
+  exported_tables = ControlVars.exported_tables
   # Get a date now to differentiate from others
   conclusion_time = pd.Timestamp(datetime.now())
+  update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path)
 
   # Obtain sheet name:
   # Apply timestamp() method to convert the timestamp to POSIX timestamp as float
@@ -50,68 +41,126 @@ def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, c
   sheet_name = "sim" + str(simulation_counter) + "_" + str(conclusion_time.timestamp())
   
   # Get a dictionary for exporting the table:
-  table_dict = {'dataframe_obj_to_be_exported': sim_df, 
+  table_dict = {'dataframe_obj_to_be_exported': df, 
                     'excel_sheet_name': sheet_name,
                     'conclusion_time': conclusion_time}
 
   # Append the dictionary on the list of exported tables:
   exported_tables.append(table_dict)
+  # Update Global Variables:
+  ControlVars.exported_tables = exported_tables
 
-
-  completion_msg = f"""
-
-
-
-
-
+  if (ControlVars.language_pt):
+    completion_msg = f"""
 
 
 
 
 
-    -------------------------------------------------------------------------------
-                      STEEL INDUSTRY DIGITAL TWIN TERMINAL
 
 
-    SIMULATION COMPLETED!
 
 
-    # SIMULATION REPORT
-    SIMULATION #{simulation_counter}: IDENTIFIER {conclusion_time.timestamp()} 
-    - STARTED SIMULATION AT (SERVER TIME) = {GlobalVars.server_start_time}
-    - FINISHED SIMULATION AT (SERVER TIME) = {conclusion_time}
+
+      -------------------------------------------------------------------------------
+                        CROP SIMULATOR - SIMULAÇÃO DE PRODUÇÃO DE SOJA
 
 
-    ## USER INPUT PARAMETERS
+      SIMULAÇÃO COMPLETA!
 
-    START DATE = {GlobalVars.start_date}
-    TOTAL DAYS SIMULATED = {GlobalVars.total_days} DAYS
-      + TOTAL HOURS SIMULATED = {GlobalVars.total_hours} HOURS
+
+      # RELATÓRIO DE SIMULAÇÃO
+      SIMULAÇÃO #{ControlVars.simulation_counter}: IDENTIFICADOR {conclusion_time.timestamp()} 
+      - SIMULAÇÃO INICIADA EM (TEMPO DO SERVIDOR) = {ControlVars.server_start_time}
+      - SIMULAÇÃO FINALIZADA EM (TEMPO DO SERVIDOR) = {conclusion_time}
+
+      ## PARÂMETROS DE ENTRADA DO USUÁRIO
+
+      DATA DE INÍCIO = {ControlVars.start_date}
+      DATA DE TÉRMINO = {ControlVars.end_date}
+      HÍBRIDO DE SOJA = {ControlVars.cultivar}
+      ALTURA DA PLANTA (PH) = {ControlVars.PH} cm
+      INSERÇÃO DA PRIMEIRA VAGEM (IFP) = {ControlVars.IFP} cm
+      NÚMERO DE HASTES E RAMOS (NLP) = {ControlVars.NLP} units
+      NÚMERO DE GRÃOS POR PLANTA (NGL) {ControlVars.NGL} units
+      NÚMERO DE GRÃOS POR VAGEM (NS) = {ControlVars.NS} units
+      MASSA DE MIL SEMENTES (MHG) = {ControlVars.MHG} g
+
+      -------------------------------------------------------------------------------
+
+      """
+
+    # CREATE A DATAFRAME WITH THE SIMULATION REPORT:
+
+    parameters = ['SIMULAÇÃO #', 'IDENTIFICADOR', 'SIMULAÇÃO INICIADA EM (TEMPO DO SERVIDOR)',
+                  'SIMULAÇÃO FINALIZADA EM (TEMPO DO SERVIDOR)', 'DATA DE INÍCIO',
+                  'DATA DE TÉRMINO', 'HÍBRIDO DE SOJA', 'ALTURA DA PLANTA (PH)',
+                  'INSERÇÃO DA PRIMEIRA VAGEM (IFP)', 'NÚMERO DE HASTES E RAMOS (NLP)',
+                  'NÚMERO DE GRÃOS POR PLANTA (NGL)', 
+                  'NÚMERO DE GRÃOS POR VAGEM (NS)', 'MASSA DE MIL SEMENTES (MHG)']
     
-    LAGGING CURRENT REACTIVE POWER = {(GlobalVars.user_inputs)[0]} kVArh
-    LEADING CURRENT REACTIVE POWER = {(GlobalVars.user_inputs)[1]} kVArh
-    tCO2(CO2) = {(GlobalVars.user_inputs)[2]} ppm
-    LAGGING CURRENT POWER FACTOR = {(GlobalVars.user_inputs)[3]} %
-    LOAD TYPE = '{(GlobalVars.user_inputs)[4]}'
-
-    -------------------------------------------------------------------------------
-
-    """
-
-  # CREATE A DATAFRAME WITH THE SIMULATION REPORT:
-
-  parameters = ['IDENTIFIER', 'STARTED SIMULATION AT (SERVER TIME)',
-                'FINISHED SIMULATION AT (SERVER TIME)', 'START DATE',
-                'TOTAL DAYS SIMULATED', '  + TOTAL HOURS SIMULATED',
-                'LAGGING CURRENT REACTIVE POWER', 'LEADING CURRENT REACTIVE POWER',
-                'tCO2(CO2)', 'LAGGING CURRENT POWER FACTOR', 'LOAD TYPE']
+    user_input_params = [f"{ControlVars.simulation_counter}, f"{conclusion_time.timestamp()}", 
+              f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
+              f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
+              f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
+              f"{ControlVars.NLP} units", f"{ControlVars.NGL} units",
+              f"{ControlVars.MHG} g"]
   
-  user_input_params = [f"SIMULATION #{simulation_counter}: IDENTIFIER {conclusion_time.timestamp()}", 
-            f"{GlobalVars.server_start_time}", f"{conclusion_time}", f"{GlobalVars.start_date}",
-            f"{GlobalVars.total_days} DAYS", f"{GlobalVars.total_hours} HOURS",
-            f"{(GlobalVars.user_inputs)[0]} kVArh", f"{(GlobalVars.user_inputs)[1]} kVArh",
-            f"{(GlobalVars.user_inputs)[2]} ppm", f"{(GlobalVars.user_inputs)[3]} %",
-            f"'{(GlobalVars.user_inputs)[4]}'"]
+  else:
+    completion_msg = f"""
+
+
+
+
+
+
+
+
+
+
+      -------------------------------------------------------------------------------
+                        CROP SIMULATOR - SOYBEAN PRODUCTION
+
+
+      SIMULATION COMPLETED!
+
+
+      # SIMULATION REPORT
+      SIMULATION #{ControlVars.simulation_counter}: IDENTIFIER {conclusion_time.timestamp()} 
+      - STARTED SIMULATION AT (SERVER TIME) = {ControlVars.server_start_time}
+      - FINISHED SIMULATION AT (SERVER TIME) = {conclusion_time}
+
+      ## USER INPUT PARAMETERS
+
+      START DATE = {ControlVars.start_date}
+      END DATE = {ControlVars.end_date}
+      CULTIVAR = {ControlVars.cultivar}
+      PLANT HEIGHT (PH) = {ControlVars.PH} cm
+      INSERTION OF THE FIRST POD (IFP) = {ControlVars.IFP} cm
+      NUMBER OF STEMS (NLP) = {ControlVars.NLP} units
+      NUMBER OF GRAINS PER PLANT (NGL) {ControlVars.NGL} units
+      NUMBER OF GRAINS PER POD (NS) = {ControlVars.NS} units
+      THOUSAND SEED WEIGHT (MHG) = {ControlVars.MHG} g
+
+      -------------------------------------------------------------------------------
+
+      """
+
+    # CREATE A DATAFRAME WITH THE SIMULATION REPORT:
+
+    parameters = ['SIMULATION #', 'IDENTIFIER', 'STARTED SIMULATION AT (SERVER TIME)',
+                  'FINISHED SIMULATION AT (SERVER TIME)', 'START DATE',
+                  'END DATE', 'CULTIVAR', 'PLANT HEIGHT (PH)',
+                  'INSERTION OF THE FIRST POD (IFP)', 'NUMBER OF STEMS (NLP)',
+                  'NUMBER OF GRAINS PER PLANT (NGL)', 
+                  'NUMBER OF GRAINS PER POD (NS)', 'THOUSAND SEED WEIGHT (MHG)']
+    
+    user_input_params = [f"{ControlVars.simulation_counter}, f"{conclusion_time.timestamp()}", 
+              f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
+              f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
+              f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
+              f"{ControlVars.NLP} units", f"{ControlVars.NGL} units",
+              f"{ControlVars.MHG} g"]
   
   sim_rep = pd.DataFrame(data = {'SIMULATION_REPORT': parameters, 'USER_INPUT': user_input_params})
 
@@ -123,12 +172,8 @@ def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, c
   exported_tables.append(table_dict)
 
   # Finally, update the list:
-  GlobalVars.exported_tables = exported_tables
+  ControlVars.exported_tables = exported_tables
   
-  ControlVars.show_results = True
-  ControlVars.show_plots = True
-  
-
   print(completion_msg)
   try:
         # only works in Jupyter Notebook:
@@ -138,66 +183,68 @@ def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, c
   except: # regular mode
         print(sim_df)
 
-
 def visualize_yield (export_images = True):
   """Plot the GY (yield) for the simulations
   : param: export_images = True keep True to
   export the image files and download them.
   """
 
-  exported_tables = GlobalVars.exported_tables
+  exported_tables = ControlVars.exported_tables
   # Loop through each simulation:
   for table_dict in exported_tables:
     # Check if it is not a Report table. These tables have 4 initial 
     # characters "REP_" in their sheet names.
     if (table_dict['excel_sheet_name'][:4] != "REP_"):
-    
-      msg = f"""
+      
+      if (ControlVars.language_pt):
+
+        msg = f"""
       
       
         ----------------------------------------------------------------------
-                          STEEL INDUSTRY DIGITAL TWIN TERMINAL
+                      CROP SIMULATOR - SIMULAÇÃO DE PRODUÇÃO DE SOJA
 
 
-                              ENERGY CONSUME (kWh)
+                              PRODUTIVIDADE DE GRÃOS (kg/ha)
 
 
-        SIMULATION DATA STORED IN {table_dict['excel_sheet_name']}
+        DADOS DE SIMULAÇÃO ARMAZENADOS EM {table_dict['excel_sheet_name']}
         
         ------------------------------------------------------------------------
 
         """
+      
+      else:
+        msg = f"""
+        
+        
+          ----------------------------------------------------------------------
+                            CROP SIMULATOR - SIMULATING SOYBEAN PRODUCTION
+
+
+                                GRAIN YIELD (kg/ha)
+
+
+          SIMULATION DATA STORED IN {table_dict['excel_sheet_name']}
+          
+          ------------------------------------------------------------------------
+
+          """
 
       print(msg)
       
       df = table_dict['dataframe_obj_to_be_exported']
-      timestamp = df['timestamp']
-      usage_kwh = df['usage_kwh']
-
-      DATA_IN_SAME_COLUMN = False
-      DATASET = None
-      COLUMN_WITH_PREDICT_VAR_X = 'X'
-      COLUMN_WITH_RESPONSE_VAR_Y = 'Y'
-      COLUMN_WITH_LABELS = 'label_column'
-      LIST_OF_DICTIONARIES_WITH_SERIES_TO_ANALYZE = [
-          
-          {'x': timestamp, 'y': usage_kwh, 'lab': 'usage_kwh'}, 
-      ]
-      X_AXIS_ROTATION = 70
-      Y_AXIS_ROTATION = 0
-      GRID = True
-      ADD_SPLINE_LINES = True
-      ADD_SCATTER_DOTS = False
-      HORIZONTAL_AXIS_TITLE = 'Timestamp'
-      VERTICAL_AXIS_TITLE = 'kWh'
-      PLOT_TITLE = table_dict['excel_sheet_name']
-
-      EXPORT_PNG = export_images
-      DIRECTORY_TO_SAVE = ""
-      FILE_NAME = table_dict['excel_sheet_name']
-      PNG_RESOLUTION_DPI = 330
+      if (ControlVars.language_pt):
+        x = df['dia']
+        y = df['produtividade_de_graos']
       
-      time_series_vis (data_in_same_column = DATA_IN_SAME_COLUMN, df = DATASET, column_with_predict_var_x = COLUMN_WITH_PREDICT_VAR_X, column_with_response_var_y = COLUMN_WITH_RESPONSE_VAR_Y, column_with_labels = COLUMN_WITH_LABELS, list_of_dictionaries_with_series_to_analyze = LIST_OF_DICTIONARIES_WITH_SERIES_TO_ANALYZE, x_axis_rotation = X_AXIS_ROTATION, y_axis_rotation = Y_AXIS_ROTATION, grid = GRID, add_splines_lines = ADD_SPLINE_LINES, add_scatter_dots = ADD_SCATTER_DOTS, horizontal_axis_title = HORIZONTAL_AXIS_TITLE, vertical_axis_title = VERTICAL_AXIS_TITLE, plot_title = PLOT_TITLE, export_png = EXPORT_PNG, directory_to_save = DIRECTORY_TO_SAVE, file_name = FILE_NAME, png_resolution_dpi = PNG_RESOLUTION_DPI)
+      else:
+        x = df['timestamp']
+        y = df['GY']
+
+      plot_title = table_dict['excel_sheet_name']
+
+      time_series_vis (x, y, plot_title)
 
       if (export_images):
         # Download the png file saved in Colab environment:
@@ -208,17 +255,16 @@ def visualize_yield (export_images = True):
     else:
       pass
 
-
 def download_excel_with_data():
   """Download Excel file containing all the tables generated from simulations."""
   
   # Create Excel file and store it in Colab's memory:
-  FILE_NAME_WITHOUT_EXTENSION = "steelindustrysimulations"
-  EXPORTED_TABLES = GlobalVars.exported_tables
+  FILE_NAME_WITHOUT_EXTENSION = "soybean_crop_simulations"
+  EXPORTED_TABLES = ControlVars.exported_tables
   FILE_DIRECTORY_PATH = ""
   export_pd_dataframe_as_excel (file_name_without_extension = FILE_NAME_WITHOUT_EXTENSION, exported_tables = EXPORTED_TABLES, file_directory_path = FILE_DIRECTORY_PATH)
 
   # Download the file:
   ACTION = 'download'
-  FILE_TO_DOWNLOAD_FROM_COLAB = "steelindustrysimulations.xlsx"
+  FILE_TO_DOWNLOAD_FROM_COLAB = "soybean_crop_simulations.xlsx"
   upload_to_or_download_file_from_colab (action = ACTION, file_to_download_from_colab = FILE_TO_DOWNLOAD_FROM_COLAB)

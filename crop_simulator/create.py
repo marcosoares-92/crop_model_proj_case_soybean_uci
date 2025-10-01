@@ -1,3 +1,4 @@
+from .core import ControlVars
 from .utils import (create_dataset, include_cultivar_column, generate_numeric_column)
 
 def get_dataset (start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG):

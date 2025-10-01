@@ -1,162 +1,27 @@
 """CROP SIMULATOR
 Simulate a Soybean production
 
-Marco Cesar Prado Soares, Data Scientist Specialist @ Bayer Crop Science LATAM
+Marco Cesar Prado Soares, Data Coordinator @ Bayer Crop Science LATAM
 marcosoares.feq@gmail.com
 marco.soares@bayer.com
 """
-
-
-# Check if the correct versions are installed
-class CheckVersions:
-  """Check if the versions of numpy, pandas, sklearn and tensorflow are correct. If not, set to the correct versions.
-    This will prevent the simulator from crashing due to version updates that make the models unable to use
-  """
-
-  def __init__(self):
-    """
-      DEFINE COMMANDS (Bash script) and success messages and set timeout.
-      : param: timeout (int): number of seconds to wait for a command to run, before considering error.
-    """
-    # This should be run before importing packages. That is why command line tools are used
-    from subprocess import Popen, PIPE, TimeoutExpired
-    # Run pip freeze to get all installed packages and their versions:
-    proc = Popen(['pip', 'freeze'], stdout = PIPE, stderr = PIPE)
-    out, error = proc.communicate()
-    """ Split a package per line, to get a list like:
-        ['absl-py==1.4.0', 'absolufy-imports==0.3.1', 'accelerate==1.10.1']
-    """
-    output = out.decode('utf-8').split("\n")
-    pkgs_to_check = ['numpy', 'pandas', 'sklearn', 'tensorflow', 'scikit-learn']
-    current_versions = {}
-
-    for line in output:
-      try: # Some outputs from Colab pip freeze are not in format pkg==version
-        pkg, version = line.split("==")
-        if (pkg in pkgs_to_check):
-          current_versions[pkg] = version
-      except:
-        pass
-
-    self.current_versions = current_versions
-    # Update packages to check:
-    self.pkgs_to_check = list(current_versions.keys())
-
-    self.correct_versions = {
-        'numpy': '2.0.2',
-        'pandas': '2.2.2',
-        'sklearn': '1.6.1',
-        'tensorflow': '2.19.0',
-        'scikit-learn': '1.6.1'
-        }
-
-  def check_versions (self):
-    """
-    Check if the versions of numpy, pandas, sklearn and tensorflow are correct. If not, set to the correct versions.
-    """
-    pkgs_to_correct  =[]
-    for pkg in self.pkgs_to_check:
-      if (self.current_versions[pkg] != self.correct_versions[pkg]):
-        pkgs_to_correct.append(pkg)
-
-    self.pkgs_to_correct = pkgs_to_correct
-    return self
-
-  def pip_command (self, pkg):
-    """
-    pkg (str): package name
-    correct_version (str): correct version of the package
-    """
-    self.cmd_line = f"""pip install {pkg}=={self.correct_versions[pkg]} -q -q -q"""
-    return self
-
-  def get_cmds (self):
-    """Get commands to run."""
-    cmds = []
-    for pkg in self.pkgs_to_correct:
-      self = self.pip_command(pkg)
-      cmds.append(self.cmd_line)
-
-    self.cmds = cmds
-    return self
-
-  def run_pip (self, cmd_line):
-    """Define a process to run from a command:
-    """
-    from subprocess import Popen, PIPE, TimeoutExpired
-
-    proc = Popen(cmd_line.split(" "), stdout = PIPE, stderr = PIPE)
-    """cmd_line = "pip install tensorflow==2.19.0 -q -q -q"
-      will lead to the list ['pip', 'install', 'tensorflow==2.19.0', '-q', '-q', '-q']
-      after splitting the string in whitespaces, what is done by .split(" ") method.
-    """
-    output, error = proc.communicate()
-
-    return self
-
-  def correct_package_versions (self):
-    """
-    Correct the versions of numpy, pandas, sklearn and tensorflow.
-    """
-    self = self.check_versions()
-    self = self.get_cmds()
-    for cmd_line in self.cmds:
-      self = self.run_pip(cmd_line)
-
-    return self
-
-checker = CheckVersions()
-checker = checker.correct_package_versions()
 
 import numpy as np
 import pandas as pd
 import sklearn
 import tensorflow as tf
-from dataclasses import dataclass
 
 # Now import other components
 
 from .core import (
+    ControlVars,
     run_simulation,
     visualize_yield,
     download_excel_with_data
-)
+ )
 
+from .utils import update_control_vars
 
-def start_simulation(PT = True):
-  """This function runs the following sequence of command line interface commands, 
-    for copying the GitHub repository containing the simulator, models and packages to a local 
-    repository named 'steelindustrysimulator' 
-  
-    It is equivalent to running the following command in a notebook's cell:
-  
-    ! git clone https://github.com/marcosoares-92/steelindustrysimulator 'steelindustrysimulator'
-    
-    The git clone documentation can be found in:
-    https://git-scm.com/docs/git-clone
-
-    : param: PT (boolean): if True, the start message is shown in Portuguese (BR).
-    If False, it is shown in English.
-
-  """
-
-  from subprocess import Popen, PIPE, TimeoutExpired
-  
-  START_MSG = """Starting steel industry operation."""
-  START_MSG_PT = """Iniciando operação da indústria de aço."""
-  
-  if (PT):
-    START_MSG = START_MSG_PT
-
-  proc = Popen(["git", "clone", "https://github.com/marcosoares-92/steelindustrysimulator", "steelindustrysimulator"], stdout = PIPE, stderr = PIPE)
-  
-  try:
-      output, error = proc.communicate(timeout = 15)
-      print (START_MSG)
-  except:
-      # General exception
-      output, error = proc.communicate()
-      print(f"Process with output: {output}, error: {error}.\n")
 
 
 def digitaltwin_start_msg(PT = True):

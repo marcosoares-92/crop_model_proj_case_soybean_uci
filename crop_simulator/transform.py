@@ -1,4 +1,4 @@
-
+from .core import ControlVars
 from .utils import (
   calculate_frequency_features,
   apply_encoding,

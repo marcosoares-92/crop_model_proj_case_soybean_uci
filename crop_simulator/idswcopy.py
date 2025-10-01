@@ -2,6 +2,7 @@
 Classes and functions copied and adapted from IDSW: https://github.com/marcosoares-92/IndustrialDataScienceWorkflow/tree/main
 
 """
+from .core import ControlVars
 
 def export_pd_dataframe_as_excel (file_name_without_extension, exported_tables = [{'dataframedataframe_obj_to_be_exported': None, 'excel_sheet_name': None}], file_directory_path = None):
     """
@@ -93,8 +94,10 @@ def export_pd_dataframe_as_excel (file_name_without_extension, exported_tables =
                                 startrow = 0, startcol = 0, merge_cells = False, 
                                 inf_rep = 'inf')
 
-def time_series_vis (x, y, label, x_axis_rotation = 70, y_axis_rotation = 0, grid = True, plot_title = None, export_png = False, directory_to_save = None, file_name = None, png_resolution_dpi = 330):
+def time_series_vis (x, y, plot_title):
     """
+    SIMPLIFIED VERSION FROM ORIGINAL IDSW FUNCTION
+
     time_series_vis (data_in_same_column = False, df = None, column_with_predict_var_x = None, column_with_response_var_y = None, column_with_labels = None, list_of_dictionaries_with_series_to_analyze = [{'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}, {'x': None, 'y': None, 'lab': None}], x_axis_rotation = 70, y_axis_rotation = 0, grid = True, add_splines_lines = True, add_scatter_dots = False, horizontal_axis_title = None, vertical_axis_title = None, plot_title = None, export_png = False, directory_to_save = None, file_name = None, png_resolution_dpi = 330):
     
     matplotlib.colors documentation:
@@ -114,13 +117,15 @@ def time_series_vis (x, y, label, x_axis_rotation = 70, y_axis_rotation = 0, gri
     # Alternatively: LINE_STYLE = '' not to show spline lines
     MARKER = ''
     # Alternatively: MARKER = 'o' to show scatter dots
+    x_axis_rotation = 70
+    y_axis_rotation = 0 
+    grid = True
+
     if (ControlVars.language_pt == True):
-      plot_title = f"Produtividade de Grãos prevista"
       vertical_axis_title = "Produtividade de Grãos (kg/ha)"
       horizontal_axis_title = "Data"
     
     else:
-      plot_title = f"Predicted Grain Yield"
       vertical_axis_title = "Grain Yield (kg/ha)"
       horizontal_axis_title = "Date"
 
@@ -137,7 +142,10 @@ def time_series_vis (x, y, label, x_axis_rotation = 70, y_axis_rotation = 0, gri
     ax = fig.add_subplot()
 
     # Scatter plot:
-    ax.plot(x, y, linestyle = LINE_STYLE, marker = MARKER, color = COLOR, alpha = OPACITY, label = label)
+    ax.plot(x, y, linestyle = LINE_STYLE, 
+                  marker = MARKER, color = COLOR, alpha = OPACITY, 
+                  # label = label
+                  )
     # Axes.plot documentation:
     # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html?msclkid=42bc92c1d13511eca8634a2c93ab89b5
             
@@ -165,47 +173,64 @@ def time_series_vis (x, y, label, x_axis_rotation = 70, y_axis_rotation = 0, gri
     # position options: 'upper right'; 'upper left'; 'lower left'; 'lower right';
     # 'right', 'center left'; 'center right'; 'lower center'; 'upper center', 'center'
     # https://www.statology.org/matplotlib-legend-position/
+    
+    # Image will be exported to root directory
+    import os
+    directory_to_save = ""
+    file_name = plot_title
+    png_resolution_dpi = 330
+    #Get the new_file_path
+    new_file_path = os.path.join(directory_to_save, file_name)
+    new_file_path = new_file_path + ".png"
+    # supported formats = 'png', 'pdf', 'ps', 'eps' or 'svg'
+    #Export the file to this new path:
+    plt.savefig(new_file_path, dpi = png_resolution_dpi, transparent = False) 
 
-    if (export_png == True):
-        # Image will be exported
-        import os
+    plt.show()
 
-        #check if the user defined a directory path. If not, set as the default root path:
-        if (directory_to_save is None):
-          #set as the default
-          directory_to_save = ""
+def upload_to_or_download_file_from_colab (action = 'download', file_to_download_from_colab = None):
+    """
+    upload_to_or_download_file_from_colab (action = 'download', file_to_download_from_colab = None):
+    
+    : param: action = 'download' to download the file to the local machine
+      action = 'upload' to upload a file from local machine to
+      Google Colab's instant memory
+    
+    : param: file_to_download_from_colab = None. This parameter is obbligatory when
+      action = 'download'. 
+      Declare as file_to_download_from_colab the file that you want to download, with
+      the correspondent extension.
+      It should not be declared in quotes.
+      e.g. to download a dictionary named dict, object_to_download_from_colab = 'dict.pkl'
+      To download a dataframe named df, declare object_to_download_from_colab = 'df.csv'
+      To export a model named keras_model, declare object_to_download_from_colab = 'keras_model.h5'
+    """
+    
+    try: # try accessing the connector, if it exists
+        if Connectors.google_drive_connector:
+            if Connectors.persistent:
+                # Run if there is a persistent connector  (if it is not None):
+                google_drive_connector = Connectors.google_drive_connector
+            else: # Create the connector    
+                google_drive_connector = MountGoogleDrive()
+                Connectors.google_drive_connector = google_drive_connector
 
-        #check if the user defined a file name. If not, set as the default name for this
-        # function.
-        if (file_name is None):
-            #set as the default
-            file_name = "time_series_vis"
+    except: # Create the connector    
+        google_drive_connector = MountGoogleDrive()
+        Connectors.google_drive_connector = google_drive_connector
 
-        #check if the user defined an image resolution. If not, set as the default 110 dpi
-        # resolution.
-        if (png_resolution_dpi is None):
-            #set as 330 dpi
-            png_resolution_dpi = 330
-
-        #Get the new_file_path
-        new_file_path = os.path.join(directory_to_save, file_name)
-        new_file_path = new_file_path + ".png"
-        # supported formats = 'png', 'pdf', 'ps', 'eps' or 'svg'
-        #Export the file to this new path:
-        plt.savefig(new_file_path, dpi = png_resolution_dpi, transparent = False) 
         
-        #Set image size (x-pixels, y-pixels) for printing in the notebook's cell:
-        #plt.figure(figsize = (12, 8))
-        #fig.tight_layout()
+    if (action == 'upload'):
+            
+        google_drive_connector = google_drive_connector.upload_to_colab()
+        return google_drive_connector.colab_files_dict
+        
+    elif (action == 'download'):
+            
+        google_drive_connector = google_drive_connector.download_from_colab(file_to_download_from_colab)
 
-        ## Show an image read from an image file:
-        ## import matplotlib.image as pltimg
-        ## img=pltimg.imread('mydecisiontree.png')
-        ## imgplot = plt.imshow(img)
-        ## See linkedIn Learning course: "Supervised machine learning and the technology boom",
-        ##  Ex_Files_Supervised_Learning, Exercise Files, lesson '03. Decision Trees', '03_05', 
-        ##  '03_05_END.ipynb'
-        plt.show()
+    else:
+        raise InvalidInputsError("Please, select a valid action, \'download\' or \'upload\'.")
 
 class LoadCropSimulator:
   """Load Crop Simulator on your environment without installing with pip install."""
