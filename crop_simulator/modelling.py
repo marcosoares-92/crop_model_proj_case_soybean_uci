@@ -25,7 +25,8 @@ def prediction_pipeline(df, cluster_model_path, lstm_model_path):
     - Produtividade de grãos (GY, kg/ha) – determinada pela colheita da área útil da parcela e padronizada para um teor de umidade dos grãos de 13
     """
     dataset = dataset.rename(columns = {'timestamp': 'dia', 'Cultivar': 'hibrido_de_soja', 'PH': 'altura_da_planta',
-                                        'NLP': 'hastes_e_ramos', 'NGL': 'graos_por_planta', 'NS': 'graos_por_vagem',
+                                        'NLP': 'hastes_e_ramos', 'NGP': 'leguminosas_por_planta',
+                                        'NGL': 'graos_por_planta', 'NS': 'graos_por_vagem',
                                         'IFP': 'insercao_da_primeira_vagem', 'MHG': 'massa_de_mil_sementes',
                                         'GY': 'produtividade_de_graos'})
 

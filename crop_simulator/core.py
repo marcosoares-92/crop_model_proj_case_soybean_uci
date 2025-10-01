@@ -1,7 +1,7 @@
 from .create import get_dataset
 from .modelling import prediction_pipeline
 from .idswcopy import export_pd_dataframe_as_excel
-from .utils import update_control_vars
+from .utils import update_control_vars, retrieve_vars_from_global_context
 
 from dataclasses import dataclass
 
@@ -13,14 +13,15 @@ class ControlVars:
     server_start_time = pd.Timestamp(datetime.now())
     simulation_counter = 0 # Count how many simulations were run
     exported_tables = [] # List of exported tables
+    cluster_model_path = '/kmeans_model.pkl'
+    lstm_model_path = '/lstm.keras'
 
-def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path):
-  """Run all the pipelines to obtain a full simulation.
+def orchestrate_pipelines():
+  """Orchestrate all the pipelines to obtain a full simulation.
   At the end, store in a list of dictionaries in ControlVars, that will be used for exporting a 
   consolidated Excel file with all simulations.
-  : params start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG: user defined parameters.
-  : params cluster_model_path, lstm_model_path: paths for the model files
   """
+  start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path = retrieve_vars_from_global_context()
   df = get_dataset(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG)
   df = prediction_pipeline(df, cluster_model_path, lstm_model_path)
   # Update on ControlVars:
@@ -182,6 +183,15 @@ def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, c
             
   except: # regular mode
         print(sim_df)
+
+
+def run_simulation(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG):
+  """
+  Set all user defined parameters, update the global context and actuate the pipeline orchestration
+  : params start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG: user defined parameters.
+  """
+  update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG)
+  orchestrate_pipelines()
 
 def visualize_yield (export_images = True):
   """Plot the GY (yield) for the simulations

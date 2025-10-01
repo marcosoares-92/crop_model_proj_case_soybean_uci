@@ -293,12 +293,22 @@ def run_model (model_path, df_transformed):
 
   return y_pred
 
+def calculate_NGP_linear_reg (NLP):
+  """Add the linear correlation between NLP and NGP to calculate NGP
+      Linear regression for NGP x NLP: 
+      NGP = 2056079224.54*(NLP) + 55.46, R² = 0.4651
+
+      : param NLP: array-like containing NLP data
+  """
+  NGP = np.array(NLP) * 2056079224.54 + 55.46
+  ControlVars.NGP = NGP
+  return NGP
+
 def reverse_log_transform (y_pred):
   """
   Apply exponential transform to reverse log transformation
   y_pred: array with model predictions in log-scale
   """
-
   y = np.exp(y_pred)
   return y
 
@@ -312,10 +322,9 @@ def update_df (df, y_pred):
 
   return dataset
 
-def update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path):
+def update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG):
   """Update control variables with user defined inputs.
   : params start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG: user defined parameters.
-  : params cluster_model_path, lstm_model_path: paths for the model files
   """
   ControlVars.start_date = start_date
   ControlVars.end_date = end_date
@@ -326,5 +335,19 @@ def update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, M
   ControlVars.NS = NS
   ControlVars.IFP = IFP
   ControlVars.MHG = MHG
-  ControlVars.cluster_model_path = cluster_model_path
-  ControlVars.lstm_model_path = lstm_model_path
+
+def retrieve_vars_from_global_context ():
+  """Retrieve variables stored in global context""""
+  start_date = ControlVars.start_date
+  end_date = ControlVars.end_date
+  cultivar = ControlVars.cultivar
+  PH = ControlVars.PH
+  NLP = ControlVars.NLP
+  NGL = ControlVars.NGL
+  NS = ControlVars.NS
+  IFP = ControlVars.IFP
+  MHG = ControlVars.MHG
+  cluster_model_path = ControlVars.cluster_model_path
+  lstm_model_path = ControlVars.lstm_model_path
+
+  return start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path
