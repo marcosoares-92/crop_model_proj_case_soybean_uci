@@ -140,9 +140,8 @@ def generate_uniform_noise (setpoint, column, total_values):
     rng = np.random.default_rng() # Random generator
     values = rng.uniform(-1, 1, total_values)
     values = values * 0.1 * std
-    # Use numpy.multiply to perform the element-wise multiplication
-    # https://numpy.org/doc/2.3/reference/generated/numpy.multiply.html
-    values = np.multiply(values, setpoints)
+    # Sum the noise with the setpoints
+    values = setpoints + values
     # Now, the original column values present a random noise associated to its standard deviation.
 
     # Correct values out of range
