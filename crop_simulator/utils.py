@@ -3,6 +3,7 @@ import pandas as pd
 import sklearn
 import tensorflow as tf
 from datetime import datetime, timedelta
+from dataclasses import dataclass
 
 
 @dataclass
