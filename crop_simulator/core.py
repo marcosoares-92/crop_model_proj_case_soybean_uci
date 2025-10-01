@@ -23,7 +23,7 @@ def orchestrate_pipelines():
   exported_tables = ControlVars.exported_tables
   # Get a date now to differentiate from others
   conclusion_time = pd.Timestamp(datetime.now())
-  update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG, cluster_model_path, lstm_model_path)
+  update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG)
 
   # Obtain sheet name:
   # Apply timestamp() method to convert the timestamp to POSIX timestamp as float
