@@ -14,8 +14,8 @@ class ControlVars:
     server_start_time = pd.Timestamp(datetime.now())
     simulation_counter = 0 # Count how many simulations were run
     exported_tables = [] # List of exported tables
-    cluster_model_path = '/kmeans_model.pkl'
-    lstm_model_path = '/lstm.keras'
+    cluster_model_path = 'kmeans_model.pkl'
+    lstm_model_path = 'lstm.keras'
 
 def create_dataset (start_date, end_date):
   """
