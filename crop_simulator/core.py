@@ -100,7 +100,7 @@ def orchestrate_pipelines():
                   'NÚMERO DE GRÃOS POR PLANTA (NGL)', 
                   'NÚMERO DE GRÃOS POR VAGEM (NS)', 'MASSA DE MIL SEMENTES (MHG)']
     
-    user_input_params = [f"{ControlVars.simulation_counter}, f"{conclusion_time.timestamp()}", 
+    user_input_params = [f"{ControlVars.simulation_counter}", f"{conclusion_time.timestamp()}", 
               f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
               f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
               f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
@@ -156,7 +156,7 @@ def orchestrate_pipelines():
                   'NUMBER OF GRAINS PER PLANT (NGL)', 
                   'NUMBER OF GRAINS PER POD (NS)', 'THOUSAND SEED WEIGHT (MHG)']
     
-    user_input_params = [f"{ControlVars.simulation_counter}, f"{conclusion_time.timestamp()}", 
+    user_input_params = [f"{ControlVars.simulation_counter}", f"{conclusion_time.timestamp()}", 
               f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
               f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
               f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
