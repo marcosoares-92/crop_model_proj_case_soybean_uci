@@ -70,12 +70,12 @@ def orchestrate_pipelines():
 
       DATA DE INÍCIO = {ControlVars.start_date}
       DATA DE TÉRMINO = {ControlVars.end_date}
-      HÍBRIDO DE SOJA = {ControlVars.cultivar}
+      HÍBRIDO DE SOJA (CULTIVAR) = {ControlVars.cultivar}
       ALTURA DA PLANTA (PH) = {ControlVars.PH} cm
       INSERÇÃO DA PRIMEIRA VAGEM (IFP) = {ControlVars.IFP} cm
-      NÚMERO DE HASTES E RAMOS (NLP) = {ControlVars.NLP} units
-      NÚMERO DE GRÃOS POR PLANTA (NGL) {ControlVars.NGL} units
-      NÚMERO DE GRÃOS POR VAGEM (NS) = {ControlVars.NS} units
+      NÚMERO DE HASTES E RAMOS (NLP) = {ControlVars.NLP} unidades
+      NÚMERO DE GRÃOS POR PLANTA (NGL) {ControlVars.NGL} unidades
+      NÚMERO DE GRÃOS POR VAGEM (NS) = {ControlVars.NS} unidades
       MASSA DE MIL SEMENTES (MHG) = {ControlVars.MHG} g
 
       -------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ def orchestrate_pipelines():
 
     parameters = ['SIMULAÇÃO #', 'IDENTIFICADOR', 'SIMULAÇÃO INICIADA EM (TEMPO DO SERVIDOR)',
                   'SIMULAÇÃO FINALIZADA EM (TEMPO DO SERVIDOR)', 'DATA DE INÍCIO',
-                  'DATA DE TÉRMINO', 'HÍBRIDO DE SOJA', 'ALTURA DA PLANTA (PH)',
+                  'DATA DE TÉRMINO', 'HÍBRIDO DE SOJA (CULTIVAR)', 'ALTURA DA PLANTA (PH)',
                   'INSERÇÃO DA PRIMEIRA VAGEM (IFP)', 'NÚMERO DE HASTES E RAMOS (NLP)',
                   'NÚMERO DE GRÃOS POR PLANTA (NGL)', 
                   'NÚMERO DE GRÃOS POR VAGEM (NS)', 'MASSA DE MIL SEMENTES (MHG)']
@@ -95,7 +95,7 @@ def orchestrate_pipelines():
               f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
               f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
               f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
-              f"{ControlVars.NLP} units", f"{ControlVars.NGL} units",
+              f"{ControlVars.NLP} unidades", f"{ControlVars.NGL} unidades", f"{ControlVars.NS} unidades"
               f"{ControlVars.MHG} g"]
   
   else:
@@ -151,7 +151,7 @@ def orchestrate_pipelines():
               f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
               f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
               f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
-              f"{ControlVars.NLP} units", f"{ControlVars.NGL} units",
+              f"{ControlVars.NLP} units", f"{ControlVars.NGL} units", f"{ControlVars.NS} units"
               f"{ControlVars.MHG} g"]
   
   sim_rep = pd.DataFrame(data = {'SIMULATION_REPORT': parameters, 'USER_INPUT': user_input_params})
