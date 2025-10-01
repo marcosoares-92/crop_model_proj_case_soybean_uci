@@ -2,6 +2,8 @@
 Classes and functions copied and adapted from IDSW: https://github.com/marcosoares-92/IndustrialDataScienceWorkflow/tree/main
 
 """
+import pandas as pd
+
 
 def export_pd_dataframe_as_excel (file_name_without_extension, exported_tables = [{'dataframedataframe_obj_to_be_exported': None, 'excel_sheet_name': None}], file_directory_path = None):
     """
