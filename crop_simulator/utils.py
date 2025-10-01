@@ -335,7 +335,7 @@ def update_control_vars(start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, M
   ControlVars.MHG = MHG
 
 def retrieve_vars_from_global_context ():
-  """Retrieve variables stored in global context""""
+  """Retrieve variables stored in global context"""
   start_date = ControlVars.start_date
   end_date = ControlVars.end_date
   cultivar = ControlVars.cultivar
