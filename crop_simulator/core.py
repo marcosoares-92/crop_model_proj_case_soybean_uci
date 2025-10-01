@@ -1,6 +1,6 @@
 from .create import get_dataset
 from .modelling import prediction_pipeline
-from .idswcopy import time_series_vis, upload_to_or_download_file_from_colab, export_pd_dataframe_as_excel
+from .idswcopy import time_series_vis, download_file_from_colab, export_pd_dataframe_as_excel
 from .utils import ControlVars, update_control_vars, retrieve_vars_from_global_context
 
 from datetime import datetime, timedelta
@@ -246,9 +246,8 @@ def visualize_yield (export_images = True):
 
       if (export_images):
         # Download the png file saved in Colab environment:
-        ACTION = 'download'
         FILE_TO_DOWNLOAD_FROM_COLAB = (table_dict['excel_sheet_name'] + ".png")
-        upload_to_or_download_file_from_colab (action = ACTION, file_to_download_from_colab = FILE_TO_DOWNLOAD_FROM_COLAB)
+        download_file_from_colab (FILE_TO_DOWNLOAD_FROM_COLAB)
 
     else:
       pass
@@ -263,6 +262,5 @@ def download_excel_with_data():
   export_pd_dataframe_as_excel (file_name_without_extension = FILE_NAME_WITHOUT_EXTENSION, exported_tables = EXPORTED_TABLES, file_directory_path = FILE_DIRECTORY_PATH)
 
   # Download the file:
-  ACTION = 'download'
   FILE_TO_DOWNLOAD_FROM_COLAB = "soybean_crop_simulations.xlsx"
-  upload_to_or_download_file_from_colab (action = ACTION, file_to_download_from_colab = FILE_TO_DOWNLOAD_FROM_COLAB)
+  download_file_from_colab (FILE_TO_DOWNLOAD_FROM_COLAB)

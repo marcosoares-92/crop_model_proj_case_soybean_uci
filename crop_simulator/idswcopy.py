@@ -4,6 +4,7 @@ Classes and functions copied and adapted from IDSW: https://github.com/marcosoar
 """
 from .utils import ControlVars
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def export_pd_dataframe_as_excel (file_name_without_extension, exported_tables = [{'dataframedataframe_obj_to_be_exported': None, 'excel_sheet_name': None}], file_directory_path = None):
@@ -190,49 +191,12 @@ def time_series_vis (x, y, plot_title):
 
     plt.show()
 
-def upload_to_or_download_file_from_colab (action = 'download', file_to_download_from_colab = None):
+def download_file_from_colab (file):
     """
-    upload_to_or_download_file_from_colab (action = 'download', file_to_download_from_colab = None):
-    
-    : param: action = 'download' to download the file to the local machine
-      action = 'upload' to upload a file from local machine to
-      Google Colab's instant memory
-    
-    : param: file_to_download_from_colab = None. This parameter is obbligatory when
-      action = 'download'. 
-      Declare as file_to_download_from_colab the file that you want to download, with
-      the correspondent extension.
-      It should not be declared in quotes.
-      e.g. to download a dictionary named dict, object_to_download_from_colab = 'dict.pkl'
-      To download a dataframe named df, declare object_to_download_from_colab = 'df.csv'
-      To export a model named keras_model, declare object_to_download_from_colab = 'keras_model.h5'
+    FUNCTION ADAPTED AND SIMPLIFIED FROM IDSW - SIMPLER CASE: NO DRIVE MOUNTED, ONLY DOWNLOAD
     """
-    
-    try: # try accessing the connector, if it exists
-        if Connectors.google_drive_connector:
-            if Connectors.persistent:
-                # Run if there is a persistent connector  (if it is not None):
-                google_drive_connector = Connectors.google_drive_connector
-            else: # Create the connector    
-                google_drive_connector = MountGoogleDrive()
-                Connectors.google_drive_connector = google_drive_connector
-
-    except: # Create the connector    
-        google_drive_connector = MountGoogleDrive()
-        Connectors.google_drive_connector = google_drive_connector
-
-        
-    if (action == 'upload'):
-            
-        google_drive_connector = google_drive_connector.upload_to_colab()
-        return google_drive_connector.colab_files_dict
-        
-    elif (action == 'download'):
-            
-        google_drive_connector = google_drive_connector.download_from_colab(file_to_download_from_colab)
-
-    else:
-        raise InvalidInputsError("Please, select a valid action, \'download\' or \'upload\'.")
+    from google.colab import files
+    files.download(file)
 
 class LoadCropSimulator:
   """Load Crop Simulator on your environment without installing with pip install."""
