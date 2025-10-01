@@ -69,12 +69,15 @@ def generate_random_values (column, total_values):
     # Since variables are close to the normal, it will create a normal-like distribution, but with some effects of skewness and kurtosis from original distributions.
     # It will also prevent the generation of data out of the range of model training
     """
-    https://numpy.org/doc/stable/reference/random/generated/numpy.random.RandomState.normal.html#numpy.random.RandomState.normal
+    https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.default_rng
+    https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.normal.html#numpy.random.Generator.normal
     loc: float or array_like of floats - Mean (“centre”) of the distribution.
     scale: float or array_like of floats - Standard deviation (spread or “width”) of the distribution. Must be non-negative.
     size: int or tuple of ints, optional - Output shape. If the given shape is, e.g., (m, n, k), then m * n * k samples are drawn. If size is None (default), a single value is returned
     """
-    values = np.random.normal(loc = max_proba, scale = std, size = total_values)
+    
+    rng = np.random.default_rng() # Random generator
+    values = rng.normal(loc = max_proba, scale = std, size = total_values)
     # Correct values out of range
     values = np.where(values < min, min, values)
     values = np.where(values > max, max, values)
@@ -99,6 +102,58 @@ def generate_random_mask (total_values):
 
   return mask
 
+def generate_uniform_noise (setpoint, column, total_values):
+  """
+  : setpoint (float): value defined by the user as setpoint
+  For the values that will not be replaced by the random distribution, add an uniform noise:
+  Create an uniform distribution from -1 to 1, and multiply for 0.1 to further reduce its influence, multiply by the std and sum to the variable
+  Guarantee that the ranges are in accordance to the experimental data
+  """
+  var_characteristics = {
+
+    'PH': {'min': 47.6, 'max': 94.8, 'max_proba': 63.3, 'std': 9.0},
+    'NLP': {'min': 20.2, 'max': 123.0, 'max_proba': 43.0, 'std': 20.1},
+    'NGL': {'min': 0.94, 'max': 14.86, 'max_proba': 1.71, 'std': 0.84},
+    'NS': {'min': 0.4, 'max': 9.0, 'max_proba': 3.7, 'std': 1.5},
+    'IFP': {'min': 7.2, 'max': 26.4, 'max_proba': 16.8, 'std': 3.0},
+    'MHG': {'min': 127.1, 'max': 216.0, 'max_proba': 156.7, 'std': 19.6} }
+
+  if column in var_characteristics.keys():
+    min = var_characteristics[column]['min']
+    max = var_characteristics[column]['max']
+    std = var_characteristics[column]['std']
+
+    # Procedure: let's create a normal distributed variable. But instead of using mu, we use the max probability, and remove values out of the range.
+    # Since variables are close to the normal, it will create a normal-like distribution, but with some effects of skewness and kurtosis from original distributions.
+    # It will also prevent the generation of data out of the range of model training
+    """
+    https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.default_rng
+    https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.uniform.html#numpy.random.Generator.uniform
+    random.Generator.uniform(low=0.0, high=1.0, size=None)
+    """
+    # Create an array of zeros with same lenght as the total of elements:
+    setpoints = np.zeros(total_values)
+    # Replace all elements with the setpoint:
+    setpoints[:] = setpoint
+    
+    # Create the random noise:
+    rng = np.random.default_rng() # Random generator
+    values = rng.uniform(-1, 1, total_values)
+    values = values * 0.1 * std
+    # Use numpy.multiply to perform the element-wise multiplication
+    # https://numpy.org/doc/2.3/reference/generated/numpy.multiply.html
+    values = np.multiply(values, setpoints)
+    # Now, the original column values present a random noise associated to its standard deviation.
+
+    # Correct values out of range
+    values = np.where(values < min, min, values)
+    values = np.where(values > max, max, values)
+
+    return values
+
+  else:
+    return None
+
 def generate_numeric_column (setpoint, column, total_values):
   """
   These are random numbers that will be generated to modify the feature selected by the user.
@@ -108,12 +163,14 @@ def generate_numeric_column (setpoint, column, total_values):
   total_values (int): total number of values for the feature
   """
   random_values = generate_random_values(column, total_values)
+  # Setpoint values with noise:
+  setpoint_with_noise = generate_uniform_noise (setpoint, column, total_values)
   mask = generate_random_mask (total_values)
 
   # Create an array for the setpoint:
   values = np.zeros(total_values)
   # Where mask ==  1, use setpoint; otherwise, use the correspondent random value
-  values = np.where(mask == 1, setpoint, random_values)
+  values = np.where(mask == 1, setpoint_with_noise, random_values)
 
   return values
 
@@ -305,12 +362,12 @@ def run_model (model_path, df_transformed):
 
 def calculate_NGP_linear_reg (NLP):
   """Add the linear correlation between NLP and NGP to calculate NGP
-      Linear regression for NGP x NLP: 
-      NGP = 2056079224.54*(NLP) + 55.46, R² = 0.4651
+      Linear regression for NGP x NLP:
+      NGP = 2.0552345917675012 * (NLP) + 13.64549993083196, R² = 0.4648436373512459
 
       : param NLP: array-like containing NLP data
   """
-  NGP = np.array(NLP) * 2056079224.54 + 55.46
+  NGP = np.array(NLP) * 2.0552345917675012 + 13.64549993083196
   ControlVars.NGP = NGP
   return NGP
 

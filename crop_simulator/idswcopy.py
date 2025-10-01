@@ -172,7 +172,7 @@ def time_series_vis (x, y, plot_title):
     ax.set_ylabel(vertical_axis_title)
 
     ax.grid(grid) # show grid or not
-    ax.legend(loc = 'upper left')
+    ### ax.legend(loc = 'upper left')
     # position options: 'upper right'; 'upper left'; 'lower left'; 'lower right';
     # 'right', 'center left'; 'center right'; 'lower center'; 'upper center', 'center'
     # https://www.statology.org/matplotlib-legend-position/
