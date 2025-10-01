@@ -29,12 +29,4 @@ def prediction_pipeline(df, cluster_model_path, lstm_model_path):
                                         'IFP': 'insercao_da_primeira_vagem', 'MHG': 'massa_de_mil_sementes',
                                         'GY': 'produtividade_de_graos'})
 
-  try:
-    print("\n")
-    # only works in Jupyter Notebook:
-    from IPython.display import display
-    display(dataset.head(10))
-
-  except: pass
-
   return dataset

@@ -30,7 +30,7 @@ def orchestrate_pipelines():
   # https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.timestamp.html#pandas.Timestamp.timestamp
   # It will guarantee that each sheet is unique. Also, hours in 00:00:00 format cannot
   # be used as sheet names, due to the ":" non-allowed character.
-  sheet_name = "sim" + str(simulation_counter) + "_" + str(conclusion_time.timestamp())
+  sheet_name = "sim" + str(ControlVars.simulation_counter) + "_" + str(conclusion_time.timestamp())
   
   # Get a dictionary for exporting the table:
   table_dict = {'dataframe_obj_to_be_exported': df, 
