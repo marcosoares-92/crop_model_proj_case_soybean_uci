@@ -88,15 +88,13 @@ def orchestrate_pipelines():
                   'SIMULAÇÃO FINALIZADA EM (TEMPO DO SERVIDOR)', 'DATA DE INÍCIO',
                   'DATA DE TÉRMINO', 'HÍBRIDO DE SOJA (CULTIVAR)', 'ALTURA DA PLANTA (PH)',
                   'INSERÇÃO DA PRIMEIRA VAGEM (IFP)', 'NÚMERO DE HASTES E RAMOS (NLP)',
-                  'NÚMERO DE GRÃOS POR PLANTA (NGL)', 
-                  'NÚMERO DE GRÃOS POR VAGEM (NS)', 'MASSA DE MIL SEMENTES (MHG)']
+                  'NÚMERO DE GRÃOS POR PLANTA (NGL)', 'NÚMERO DE GRÃOS POR VAGEM (NS)', 'MASSA DE MIL SEMENTES (MHG)']
     
-    user_input_params = [f"{ControlVars.simulation_counter}", f"{conclusion_time.timestamp()}", 
-              f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
-              f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
-              f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
-              f"{ControlVars.NLP} unidades", f"{ControlVars.NGL} unidades", f"{ControlVars.NS} unidades"
-              f"{ControlVars.MHG} g"]
+    user_input_params = [f"{ControlVars.simulation_counter}", f"{conclusion_time.timestamp()}", f"{ControlVars.server_start_time}", 
+                          f"{conclusion_time}", f"{ControlVars.start_date}",
+                          f"{ControlVars.end_date}", f"{ControlVars.cultivar}", f"{ControlVars.PH} cm", 
+                          f"{ControlVars.IFP} cm", f"{ControlVars.NLP} unidades", 
+                          f"{ControlVars.NGL} unidades", f"{ControlVars.NS} unidades", f"{ControlVars.MHG} g"]
   
   else:
     completion_msg = f"""
@@ -144,16 +142,15 @@ def orchestrate_pipelines():
                   'FINISHED SIMULATION AT (SERVER TIME)', 'START DATE',
                   'END DATE', 'CULTIVAR', 'PLANT HEIGHT (PH)',
                   'INSERTION OF THE FIRST POD (IFP)', 'NUMBER OF STEMS (NLP)',
-                  'NUMBER OF GRAINS PER PLANT (NGL)', 
-                  'NUMBER OF GRAINS PER POD (NS)', 'THOUSAND SEED WEIGHT (MHG)']
+                  'NUMBER OF GRAINS PER PLANT (NGL)', 'NUMBER OF GRAINS PER POD (NS)', 'THOUSAND SEED WEIGHT (MHG)']
     
-    user_input_params = [f"{ControlVars.simulation_counter}", f"{conclusion_time.timestamp()}", 
-              f"{ControlVars.server_start_time}", f"{conclusion_time}", f"{ControlVars.start_date}",
-              f"{ControlVars.end_date}", f"{ControlVars.cultivar}",
-              f"{ControlVars.PH} cm", f"{ControlVars.IFP} cm",
-              f"{ControlVars.NLP} units", f"{ControlVars.NGL} units", f"{ControlVars.NS} units"
-              f"{ControlVars.MHG} g"]
+    user_input_params = [f"{ControlVars.simulation_counter}", f"{conclusion_time.timestamp()}", f"{ControlVars.server_start_time}", 
+                          f"{conclusion_time}", f"{ControlVars.start_date}",
+                          f"{ControlVars.end_date}", f"{ControlVars.cultivar}", f"{ControlVars.PH} cm", 
+                          f"{ControlVars.IFP} cm", f"{ControlVars.NLP} units", 
+                          f"{ControlVars.NGL} units", f"{ControlVars.NS} units", f"{ControlVars.MHG} g"]
   
+
   sim_rep = pd.DataFrame(data = {'SIMULATION_REPORT': parameters, 'USER_INPUT': user_input_params})
 
   # Get a dictionary for exporting the table:
