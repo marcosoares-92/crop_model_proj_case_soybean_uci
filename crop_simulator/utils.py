@@ -3,8 +3,6 @@ import pandas as pd
 import sklearn
 import tensorflow as tf
 
-from .core import ControlVars
-
 
 def create_dataset (start_date, end_date):
   """

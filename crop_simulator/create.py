@@ -1,4 +1,3 @@
-from .core import ControlVars
 from .utils import (create_dataset, include_cultivar_column, generate_numeric_column, calculate_NGP_linear_reg)
 
 

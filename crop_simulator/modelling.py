@@ -1,4 +1,3 @@
-from .core import ControlVars
 from .transform import feature_eng_pipeline
 from .utils import (run_model, update_df)
 
