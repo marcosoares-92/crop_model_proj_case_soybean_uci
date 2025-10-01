@@ -5,6 +5,17 @@ import tensorflow as tf
 from datetime import datetime, timedelta
 
 
+@dataclass
+class ControlVars:
+
+    language_pt = True # If language_pt = True, responses are shown in Portugues (BR). Otherwise, they are in English
+    # default value of start date will be the instant:
+    server_start_time = pd.Timestamp(datetime.now())
+    simulation_counter = 0 # Count how many simulations were run
+    exported_tables = [] # List of exported tables
+    cluster_model_path = '/kmeans_model.pkl'
+    lstm_model_path = '/lstm.keras'
+
 def create_dataset (start_date, end_date):
   """
   start_date (str): start date of the dataset. Format: '2024-02-21'

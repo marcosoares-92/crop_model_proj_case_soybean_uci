@@ -1,5 +1,5 @@
 from .transform import feature_eng_pipeline
-from .utils import (run_model, update_df)
+from .utils import (ControlVars, run_model, update_df)
 
 def prediction_pipeline(df, cluster_model_path, lstm_model_path):
   """

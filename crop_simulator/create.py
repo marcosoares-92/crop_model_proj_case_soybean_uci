@@ -1,4 +1,5 @@
-from .utils import (create_dataset, include_cultivar_column, generate_numeric_column, calculate_NGP_linear_reg)
+from .utils import (create_dataset, include_cultivar_column, 
+                    generate_numeric_column, calculate_NGP_linear_reg)
 
 
 def get_dataset (start_date, end_date, cultivar, PH, NLP, NGL, NS, IFP, MHG):

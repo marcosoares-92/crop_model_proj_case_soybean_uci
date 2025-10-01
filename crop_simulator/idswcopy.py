@@ -2,6 +2,7 @@
 Classes and functions copied and adapted from IDSW: https://github.com/marcosoares-92/IndustrialDataScienceWorkflow/tree/main
 
 """
+from .utils import ControlVars
 import pandas as pd
 
 

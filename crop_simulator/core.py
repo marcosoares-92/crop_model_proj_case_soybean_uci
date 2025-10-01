@@ -1,22 +1,12 @@
 from .create import get_dataset
 from .modelling import prediction_pipeline
 from .idswcopy import export_pd_dataframe_as_excel
-from .utils import update_control_vars, retrieve_vars_from_global_context
+from .utils import ControlVars, update_control_vars, retrieve_vars_from_global_context
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import pandas as pd
 
-@dataclass
-class ControlVars:
-
-    language_pt = True # If language_pt = True, responses are shown in Portugues (BR). Otherwise, they are in English
-    # default value of start date will be the instant:
-    server_start_time = pd.Timestamp(datetime.now())
-    simulation_counter = 0 # Count how many simulations were run
-    exported_tables = [] # List of exported tables
-    cluster_model_path = '/kmeans_model.pkl'
-    lstm_model_path = '/lstm.keras'
 
 def orchestrate_pipelines():
   """Orchestrate all the pipelines to obtain a full simulation.
